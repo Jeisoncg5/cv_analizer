@@ -3,6 +3,8 @@ from io import BytesIO
 
 def extraer_texto_pdf(archivo_pdf):
     try:
+        # Resetea el puntero del stream al inicio para asegurar que se lee completo
+        archivo_pdf.seek(0)
         pdf_reader = PyPDF2.PdfReader(BytesIO(archivo_pdf.read()))
         texto_completo = ""
 

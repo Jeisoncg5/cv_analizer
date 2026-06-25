@@ -166,6 +166,12 @@ def procesar_analisis(archivo_cv, descripcion_puesto):
         progress_bar.empty()
         status_text.empty()
 
+        # Verifica si hubo error en la evaluación
+        if "Error" in resultado.nombre_candidato:
+            st.error(f"❌ Error en la evaluación: {resultado.nombre_candidato}")
+            st.error(f"Detalles: {resultado.experiencia_relevante}")
+            return
+
         mostrar_resultados(resultado)
 
 def mostrar_resultados(resultado: AnalisisCV):
@@ -206,7 +212,7 @@ def mostrar_resultados(resultado: AnalisisCV):
     col1, col2 = st.columns(2)
     with col1:
         st.info(f"**👤 Nombre:** {resultado.nombre_candidato}")
-        st.info(f"**⏱️ Experiencia:** {resultado.experiencia_años} años")
+        st.info(f"**⏱️ Experiencia:** {resultado.experiencia}")
 
     with col2:
         st.info(f"**🎓 Educación:** {resultado.educacion}")
