@@ -1,7 +1,68 @@
+import altair as alt
+import pandas as pd
 import streamlit as st
 from models.cv_model import AnalisisCV
 from services.pdf_processor import extraer_texto_pdf
 from services.cv_evaluator import evaluar_candidato
+
+
+PALETA_HABILIDADES = {
+    "c#": "#7E57C2",
+    "csharp": "#7E57C2",
+    ".net": "#5E35B1",
+    "asp.net": "#512DA8",
+    "python": "#4CAF50",
+    "java": "#F4511E",
+    "javascript": "#F9A825",
+    "typescript": "#1976D2",
+    "react": "#00ACC1",
+    "angular": "#E53935",
+    "vue": "#43A047",
+    "html": "#FB8C00",
+    "css": "#1E88E5",
+    "sql": "#00897B",
+    "postgresql": "#336791",
+    "mysql": "#1565C0",
+    "mongodb": "#2E7D32",
+    "docker": "#039BE5",
+    "kubernetes": "#3949AB",
+    "aws": "#FF8F00",
+    "azure": "#0078D4",
+    "git": "#6D4C41",
+    "node": "#558B2F",
+}
+
+def obtener_color_habilidad(habilidad: str) -> str:
+    """Asigna un color semantico por tecnologia."""
+
+    habilidad_normalizada = habilidad.lower()
+    for clave, color in PALETA_HABILIDADES.items():
+        if clave in habilidad_normalizada:
+            return color
+    return "#127F8C"
+
+
+def construir_datos_habilidades(habilidades: list[str], porcentaje_ajuste: int) -> pd.DataFrame:
+    """Crea una escala visual estimada para cada habilidad segun su relevancia."""
+
+    if not habilidades:
+        return pd.DataFrame(columns=["Habilidad", "Nivel", "Color"])
+
+    nivel_base = max(55, min(95, porcentaje_ajuste + 15))
+    decremento = 8 if len(habilidades) > 1 else 0
+
+    datos = []
+    for indice, habilidad in enumerate(habilidades):
+        nivel = max(35, nivel_base - (indice * decremento))
+        datos.append(
+            {
+                "Habilidad": habilidad,
+                "Nivel": nivel,
+                "Color": obtener_color_habilidad(habilidad),
+            }
+        )
+
+    return pd.DataFrame(datos)
 
 def main():
     """Función principal que define la interfaz de usuario de Streamlit"""
@@ -229,6 +290,29 @@ def mostrar_resultados(resultado: AnalisisCV):
         for i, habilidad in enumerate(resultado.habilidades_clave):
             with cols[i % 4]:
                 st.success(f"✅ {habilidad}")
+
+        habilidades_df = construir_datos_habilidades(
+            resultado.habilidades_clave,
+            resultado.porcentaje_ajuste,
+        )
+        st.caption(
+            "El diagrama muestra un nivel estimado de relevancia para cada habilidad."
+        )
+        grafico_habilidades = (
+            alt.Chart(habilidades_df)
+            .mark_bar(size=28, cornerRadiusEnd=6)
+            .encode(
+                x=alt.X("Nivel:Q", scale=alt.Scale(domain=[0, 100]), title="Nivel estimado"),
+                y=alt.Y("Habilidad:N", sort="-x", title=None),
+                color=alt.Color("Color:N", scale=None, legend=None),
+                tooltip=[
+                    alt.Tooltip("Habilidad:N", title="Habilidad"),
+                    alt.Tooltip("Nivel:Q", title="Nivel estimado"),
+                ],
+            )
+            .properties(height=max(220, len(habilidades_df) * 52))
+        )
+        st.altair_chart(grafico_habilidades, use_container_width=True)
     else:
         st.warning("No se identificaron habilidades técnicas específicas")
 

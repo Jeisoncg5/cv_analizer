@@ -1,3 +1,4 @@
+
 # CV Analyzer with Mistral AI
 
 Aplicacion en Streamlit para analizar hojas de vida en PDF y compararlas contra una descripcion de cargo usando Mistral AI.
