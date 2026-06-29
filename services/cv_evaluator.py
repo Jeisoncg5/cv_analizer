@@ -1,19 +1,28 @@
 import os
 
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
 
 from models.cv_model import AnalisisCV
 from prompts.cv_prompts import crear_sistema_prompts
 
 load_dotenv()
 
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+MISTRAL_MODEL = os.getenv("MISTRAL_MODEL", "mistral-small-latest")
 
 
 def crear_evaluador_cv():
-    modelo_base = ChatOpenAI(
-        model=OPENAI_MODEL,
+    from langchain_mistralai import ChatMistralAI
+
+    if not MISTRAL_API_KEY:
+        raise ValueError(
+            "No se encontro MISTRAL_API_KEY en el archivo .env. "
+            "Agrega tu clave de Mistral AI antes de analizar candidatos."
+        )
+
+    modelo_base = ChatMistralAI(
+        api_key=MISTRAL_API_KEY,
+        model=MISTRAL_MODEL,
         temperature=0.2,
     )
     modelo_estructurado = modelo_base.with_structured_output(AnalisisCV)
@@ -34,7 +43,7 @@ def evaluar_candidato(texto_cv: str, descripcion_puesto: str):
         return resultado
 
     except Exception as e:
-        mensaje = str(e) or "No se pudo completar la evaluacion con OpenAI."
+        mensaje = str(e) or "No se pudo completar la evaluacion con Mistral AI."
         print(f"ERROR EN EVALUACION: {mensaje}")
         print(f"Tipo de error: {type(e).__name__}")
         return AnalisisCV(
@@ -44,6 +53,8 @@ def evaluar_candidato(texto_cv: str, descripcion_puesto: str):
             educacion="No se puede determinar.",
             experiencia_relevante=f"Error durante el analisis: {mensaje}",
             fortalezas=["Requiere revision manual."],
-            areas_mejora=["Verifica tu API key de OpenAI y el modelo configurado."],
+            areas_mejora=[
+                "Verifica que .env contenga MISTRAL_API_KEY valida y que el modelo configurado exista en tu cuenta."
+            ],
             porcentaje_ajuste=0,
         )

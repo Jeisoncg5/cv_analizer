@@ -1,6 +1,6 @@
-# CV Analyzer with OpenAI
+# CV Analyzer with Mistral AI
 
-Aplicacion en Streamlit para analizar hojas de vida en PDF y compararlas contra una descripcion de cargo usando OpenAI.
+Aplicacion en Streamlit para analizar hojas de vida en PDF y compararlas contra una descripcion de cargo usando Mistral AI.
 
 ## Funcionalidades
 
@@ -15,7 +15,7 @@ Aplicacion en Streamlit para analizar hojas de vida en PDF y compararlas contra 
 - Python
 - Streamlit
 - LangChain
-- OpenAI
+- Mistral AI
 - Pydantic
 - PyPDF2
 
@@ -40,7 +40,7 @@ cv_analizer/
 ## Requisitos
 
 - Python 3.11 o superior
-- Una API key valida de OpenAI
+- Una API key valida de Mistral AI
 
 ## Instalacion
 
@@ -71,11 +71,11 @@ cp .env.example .env
 Edita `.env` con tu API key:
 
 ```env
-OPENAI_API_KEY=your_openai_api_key_here
-OPENAI_MODEL=gpt-4o-mini
+MISTRAL_API_KEY=your_mistral_api_key_here
+MISTRAL_MODEL=mistral-small-latest
 ```
 
-`OPENAI_MODEL` es opcional. Si no lo defines, el proyecto usa `gpt-4o-mini`.
+`MISTRAL_MODEL` es opcional. Si no lo defines, el proyecto usa `mistral-small-latest`.
 
 ## Como ejecutar
 
@@ -103,7 +103,7 @@ http://localhost:8501
 
 ### Falta la API key
 
-Si `OPENAI_API_KEY` no esta definida o esta vacia, la evaluacion fallara y la app devolvera un error controlado.
+Si `MISTRAL_API_KEY` no esta definida o esta vacia, la evaluacion fallara y la app devolvera un error controlado.
 
 ### El PDF no tiene texto seleccionable
 
@@ -124,4 +124,3 @@ Antes de usar la app:
 ```powershell
 python -m compileall app.py services prompts models ui
 ```
-
